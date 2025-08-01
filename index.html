@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Santos Roleplay</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+    height: 100vh;
+    overflow: hidden;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 0;
+  }
+  .announcement {
+    background-color: #e74c3c;
+    color: white;
+    padding: 10px 15px;
+    text-align: center;
+    animation: blink 1.2s infinite;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    font-weight: bold;
+  }
+  @keyframes blink {
+    50% {opacity: 0.6;}
+  }
+  .ortadaki-yazi {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Impact', sans-serif;
+    font-size: 72px;
+    color: white;
+    text-shadow: 4px 4px 15px black;
+    z-index: 5;
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .sidebar {
+    position: fixed;
+    top: 50px;
+    left: 0;
+    width: 250px;
+    height: calc(100% - 50px);
+    background-color: rgba(0, 0, 0, 0.75);
+    padding-top: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.8);
+    z-index: 10;
+    overflow-y: auto;
+  }
+  .sidebar button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 12px 15px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: left;
+    gap: 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+  .sidebar button:hover,
+  .sidebar button.active {
+    background-color: #ff0055;
+  }
+  .sidebar .material-icons {
+    font-size: 20px;
+  }
+  .sidebar .discord-link {
+    background-color: #5865F2;
+    margin: 10px 15px;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    border: none;
+    display: block;
+    text-decoration: none;
+    color: white;
+  }
+  .sidebar .discord-link:hover {
+    background-color: #4752c4;
+  }
+  .main {
+    margin-left: 250px;
+    margin-top: 70px;
+    padding: 20px 30px;
+    height: calc(100% - 70px);
+    overflow-y: auto;
+    position: relative;
+    z-index: 1;
+  }
+  .content {
+    display: none;
+  }
+  .content.active {
+    display: block;
+  }
+  h2 {
+    margin-top: 0;
+    border-bottom: 2px solid #ff0055;
+    padding-bottom: 6px;
+  }
+  form input, form textarea, form select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0 20px 0;
+    border: none;
+    border-radius: 5px;
+    font-size: 15px;
+  }
+  form button {
+    background-color: #ff0055;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  form button:hover {
+    background-color: #d50044;
+  }
+  .player-count {
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 18px;
+  }
+  /* Dil seçici */
+  .language-selector {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    z-index: 1100;
+    background: rgba(0,0,0,0.6);
+    border-radius: 6px;
+    padding: 5px 10px;
+  }
+  .language-selector select {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  /* Responsive */
+  @media (max-width: 768px) {
+    .sidebar {
+      width: 100px;
+      padding-top: 15px;
+    }
+    .sidebar button {
+      font-size: 13px;
+      padding: 10px 10px;
+      gap: 5px;
+    }
+    .main {
+      margin-left: 100px;
+      margin-top: 70px;
+      padding: 15px 20px;
+    }
+    .ortadaki-yazi {
+      font-size: 48px;
+    }
+  }
+  /* Sunucuya Bağlan butonu özel stili */
+  .connect-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    font-weight: bold;
+    background: #27ae60;
+    margin: 10px 15px;
+    border-radius: 6px;
+    padding: 12px 15px;
+    font-size: 16px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .connect-btn:hover {
+    background-color: #1e8449;
+  }
+</style>
+</head>
+<body>
+
+  <div class="announcement">⚠️ Sunucu kurallarına uyulmadığında ceza verilir!</div>
+
+  <div class="language-selector">
+    <select id="languageSelect" onchange="changeLanguage()">
+      <option value="tr" selected>Türkçe</option>
+      <option value="en">English</option>
+    </select>
+  </div>
+
+  <div class="ortadaki-yazi">SANTOS ROLEPLAY</div>
+
+  <div class="sidebar">
+    <button class="active" onclick="showContent('home', this)"><span class="material-icons">home</span><span class="btn-text">Anasayfa</span></button>
+    <button onclick="showContent('illegal', this)"><span class="material-icons">gavel</span><span class="btn-text">İllegal Politikalar</span></button>
+    <button onclick="showContent('legal', this)"><span class="material-icons">balance</span><span class="btn-text">Legal Politikalar</span></button>
+    <button onclick="showContent('penalties', this)"><span class="material-icons">report</span><span class="btn-text">Ceza Süreleri</span></button>
+    <button onclick="showContent('rules', this)"><span class="material-icons">assignment</span><span class="btn-text">Kurallar</span></button>
+    <button onclick="showContent('updates', this)"><span class="material-icons">new_releases</span><span class="btn-text">Güncellemeler</span></button>
+    <button onclick="showContent('gallery', this)"><span class="material-icons">photo_library</span><span class="btn-text">Galeri</span></button>
+    <button onclick="showContent('staff', this)"><span class="material-icons">supervisor_account</span><span class="btn-text">Staff Listesi</span></button>
+    <button onclick="showContent('terms', this)"><span class="material-icons">menu_book</span><span class="btn-text">Roleplay Terimleri</span></button>
+    <button onclick="showContent('events', this)"><span class="material-icons">event</span><span class="btn-text">Etkinlik Takvimi</span></button>
+    <button onclick="showContent('contact', this)"><span class="material-icons">email</span><span class="btn-text">İletişim</span></button>
+
+    <!-- Sunucuya Bağlan butonu -->
+    <a href="samp://sunucu.ip.adresi:port" class="connect-btn" target="_blank" rel="noopener noreferrer">
+      <span class="material-icons">gamepad</span> 🕹️ Sunucuya Bağlan
+    </a>
+
+    <a href="https://discord.gg/4DcBfRtxPy" target="_blank" class="discord-link"><span class="material-icons">chat</span>Discord'a Katıl</a>
+  </div>
+
+  <div class="main">
+
+    <!-- Anasayfa -->
+    <div id="home" class="content active">
+      <h2>Anasayfa</h2>
+      <p>Sunucumuza hoş geldiniz! Sol menüden bilgileri inceleyebilirsiniz.</p>
+      <p class="player-count"><strong>Aktif Oyuncu Sayısı:</strong> <span id="playerCount">35</span></p>
+    </div>
+
+    <!-- İllegal Politikalar -->
+    <div id="illegal" class="content">
+      <h2>İllegal Politikalar</h2>
+      <p>İllegal RP rollerine ilişkin kurallar burada yer alır.</p>
+    </div>
+
+    <!-- Legal Politikalar -->
+    <div id="legal" class="content">
+      <h2>Legal Politikalar</h2>
+      <p>Resmi iş yerleri ve devlet kurumlarına ait kurallar burada bulunur.</p>
+    </div>
+
+    <!-- Ceza Süreleri -->
+    <div id="penalties" class="content">
+      <h2>Ceza Süreleri</h2>
+      <p>Kural ihlallerinde uygulanacak ceza süreleri burada belirtilir.</p>
+    </div>
+
+    <!-- Kurallar -->
+    <div id="rules" class="content">
+      <h2>Sunucu Kuralları</h2>
+      <ul>
+        <li>1. Saygılı olun.</li>
+        <li>2. Reklam yapmak yasaktır.</li>
+        <li>3. Metagaming ve powergaming yapmayın.</li>
+        <li>4. Yetkililerin talimatlarına uyun.</li>
+        <li>5. Hile ve exploit kullanımı kesinlikle yasaktır.</li>
+      </ul>
+    </div>
+
+    <!-- Güncellemeler -->
+    <div id="updates" class="content">
+      <h2>Güncellemeler</h2>
+      <ul>
+        <li>01.08.2025 - Yeni araçlar eklendi.</li>
+        <li>28.07.2025 - Sunucu performansı iyileştirildi.</li>
+        <li>20.07.2025 - Yeni RP senaryoları eklendi.</li>
+      </ul>
+    </div>
+
+    <!-- Galeri -->
+    <div id="gallery" class="content">
+      <h2>Galeri</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <img src="https://via.placeholder.com/150x100?text=Screenshot+1" alt="Screenshot 1" style="border-radius:8px; max-width: 100%;" />
+        <img src="https://via.placeholder.com/150x100?text=Screenshot+2" alt="Screenshot 2" style="border-radius:8px; max-width: 100%;" />
+        <img src="https://via.placeholder.com/150x100?text=Screenshot+3" alt="Screenshot 3" style="border-radius:8px; max-width: 100%;" />
+      </div>
+    </div>
+
+    <!-- Staff Listesi -->
+    <div id="staff" class="content">
+      <h2>Staff Listesi</h2>
+      <ul>
+        <li>Ahmet - Sunucu Sahibi</li>
+        <li>Mehmet - Admin</li>
+        <li>Ayşe - Moderatör</li>
+        <li>Fatma - Destek Ekibi</li>
+      </ul>
+    </div>
+
+    <!-- Roleplay Terimleri -->
+    <div id="terms" class="content">
+      <h2>Roleplay Terimleri</h2>
+      <p>IC (In Character): Karakter içi iletişim.</p>
+      <p>OOC (Out Of Character): Karakter dışı iletişim.</p>
+      <p>MG (Metagaming): OOC bilgilerin IC olarak kullanılması.</p>
+      <p>PG (Powergaming): Karakterin gerçekçi olmayan hareketleri.</p>
+      <p>RDM (Random Deathmatch): Nedensiz öldürme.</p>
+      <p>VDM (Vehicle Deathmatch): Araçla rastgele öldürme.</p>
+    </div>
+
+    <!-- Etkinlik Takvimi -->
+    <div id="events" class="content">
+      <h2>Etkinlik Takvimi</h2>
+      <ul>
+        <li>05 Ağustos 2025 - Yaz Festivali</li>
+        <li>15 Ağustos 2025 - Rol Yapma Maratonu</li>
+        <li>30 Ağustos 2025 - Zafer Bayramı Etkinliği</li>
+      </ul>
+    </div>
+
+    <!-- İletişim -->
+    <div id="contact" class="content">
+      <h2>İletişim Formu</h2>
+      <form onsubmit="event.preventDefault(); alert(lang === 'tr' ? 'Mesajınız gönderildi!' : 'Your message has been sent!'); this.reset();">
+        <input type="text" placeholder="Adınız" required />
+        <input type="email" placeholder="E-posta" required />
+        <textarea placeholder="Mesajınız" rows="5" required></textarea>
+        <button type="submit">Gönder</button>
+      </form>
+    </div>
+
+  </div>
+
+<script>
+  let lang = 'tr';
+  function showContent(id, btn) {
+    document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+  }
+
+  function changeLanguage() {
+    const select = document.getElementById('languageSelect');
+    lang = select.value;
+    if(lang === 'en') {
+      document.querySelector('.announcement').textContent = "⚠️ Failure to follow server rules will result in penalties!";
+      document.querySelector('.ortadaki-yazi').textContent = "SANTOS ROLEPLAY";
+      document.querySelector('#home h2').textContent = "Homepage";
+      document.querySelector('#home p').textContent = "Welcome to our server! Use the left menu to browse info.";
+      document.querySelector('.player-count').innerHTML = "<strong>Active Players:</strong> <span id='playerCount'>35</span>";
+      const buttons = document.querySelectorAll('.sidebar button .btn-text');
+      const enTexts = ["Homepage","Illegal Policies","Legal Policies","Penalties","Rules","Updates","Gallery","Staff List","Roleplay Terms","Event Calendar","Contact"];
+      buttons.forEach((el,i)=> el.textContent = enTexts[i]);
+      document.querySelector('.discord-link').textContent = "Join Discord";
+      document.querySelector('#contact h2').textContent = "Contact Form";
+      document.querySelector('form input[placeholder="Adınız"]').placeholder = "Your Name";
+      document.querySelector('form input[placeholder="E-posta"]').placeholder = "Email";
+      document.querySelector('form textarea').placeholder = "Your Message";
+      document.querySelector('form button').textContent = "Send";
+    } else {
+      document.querySelector('.announcement').textContent = "⚠️ Sunucu kurallarına uyulmadığında ceza verilir!";
+      document.querySelector('.ortadaki-yazi').textContent = "SANTOS ROLEPLAY";
+      document.querySelector('#home h2').textContent = "Anasayfa";
+      document.querySelector('#home p').textContent = "Sunucumuza hoş geldiniz! Sol menüden bilgileri inceleyebilirsiniz.";
+      document.querySelector('.player-count').innerHTML = "<strong>Aktif Oyuncu Sayısı:</strong> <span id='playerCount'>35</span>";
+      const buttons = document.querySelectorAll('.sidebar button .btn-text');
+      const trTexts = ["Anasayfa","İllegal Politikalar","Legal Politikalar","Ceza Süreleri","Kurallar","Güncellemeler","Galeri","Staff Listesi","Roleplay Terimleri","Etkinlik Takvimi","İletişim"];
+      buttons.forEach((el,i)=> el.textContent = trTexts[i]);
+      document.querySelector('.discord-link').textContent = "Discord'a Katıl";
+      document.querySelector('#contact h2').textContent = "İletişim Formu";
+      document.querySelector('form input[placeholder="Your Name"]').placeholder = "Adınız";
+      document.querySelector('form input[placeholder="Email"]').placeholder = "E-posta";
+      document.querySelector('form textarea').placeholder = "Mesajınız";
+      document.querySelector('form button').textContent = "Gönder";
+    }
+  }
+
+  // Sayfa açılır açılmaz ilk sekmeyi aktif yap
+  document.addEventListener('DOMContentLoaded', () => {
+    const firstBtn = document.querySelector('.sidebar button');
+    if(firstBtn) firstBtn.click();
+  });
+
+  // Aktif oyuncu sayısını API'den çekmek istersen buraya ekleyebilirsin
+  // Şimdilik sabit 35 gösteriliyor
+
+</script>
+
+</body>
+</html>
